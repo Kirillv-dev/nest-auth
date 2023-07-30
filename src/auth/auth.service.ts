@@ -60,6 +60,10 @@ export class AuthService {
     return tokens;
   }
 
+  async signOut(userId: number) {
+    await this.userService.update(userId, { refreshToken: null });
+  }
+
   async updateRefreshToken(
     userId: number,
     refreshToken: string,

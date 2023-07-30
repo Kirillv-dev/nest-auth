@@ -4,6 +4,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { NewsModule } from './news/news.module';
 import { UserModule } from './user/user.module';
 
 @Module({
@@ -20,10 +21,11 @@ import { UserModule } from './user/user.module';
       dialect: 'postgres',
       synchronize: true,
       autoLoadModels: true,
-      sync: { force: true, alter: true },
+      sync: { force: false, alter: true },
     }),
     UserModule,
     AuthModule,
+    NewsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
