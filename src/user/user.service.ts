@@ -1,6 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { UserRepository } from './user.repository';
 
 @Injectable()
@@ -10,24 +8,41 @@ export class UserService {
     public userRepository: UserRepository,
   ) {}
 
-  create(createUserDto: CreateUserDto) {
+  create(createUserDto: IUser) {
     return this.userRepository.create(createUserDto);
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
+  async update(id: number, updateUserDto: IUser) {
+    await this.findOneById(id, true);
+
     return this.userRepository.updateById(id, updateUserDto);
   }
 
-  findOne(where: any) {
-    return this.userRepository.findOne(where);
+  async findOneById(id: number, throwIfNotFound: boolean = false) {
+    const user = await this.userRepository.findOne({ id });
+    if (!user && throwIfNotFound) {
+      throw new NotFoundException('User with this id does not exists');
+    }
+
+    return user;
   }
 
-  findOneByPhone(phone: string) {
-    return this.userRepository.findOne({ phone });
+  async findOneByPhone(phone: string, throwIfNotFound: boolean = false) {
+    const user = await this.userRepository.findOne({ phone });
+    if (!user && throwIfNotFound) {
+      throw new NotFoundException('User with this id does not exists');
+    }
+
+    return user;
   }
 
-  findOneByEmail(email: string) {
-    return this.userRepository.findOne({ email });
+  async findOneByEmail(email: string, throwIfNotFound: boolean = false) {
+    const user = await this.userRepository.findOne({ email });
+    if (!user && throwIfNotFound) {
+      throw new NotFoundException('User with this id does not exists');
+    }
+
+    return user;
   }
 
   findOneByRefreshToken(refreshToken: string) {

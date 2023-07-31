@@ -1,4 +1,4 @@
-import {  Model } from 'sequelize';
+import { Model } from 'sequelize';
 import { Column, Table } from 'sequelize-typescript';
 
 @Table
@@ -12,7 +12,7 @@ export class User extends Model {
   @Column
   lastName?: string;
 
-  @Column
+  @Column({ unique: true })
   email?: string;
 
   @Column

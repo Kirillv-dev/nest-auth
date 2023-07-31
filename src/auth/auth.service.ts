@@ -1,9 +1,12 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import { SignInDto } from './dto/signIn.dto';
 import { SignUpDto } from './dto/signUp.dto';
 import * as bcrypt from 'bcrypt';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { ConfigService } from '@nestjs/config';
 import { sign, verify } from 'jsonwebtoken';
 
@@ -18,15 +21,16 @@ export class AuthService {
     const { email, password } = signUpDto;
 
     const foundUser = await this.userService.findOneByEmail(email);
-
-    if (foundUser) throw new Error('User already exists');
+    if (foundUser) {
+      throw new ConflictException('User with this email already exists');
+    }
 
     const hashPassword = await bcrypt.hash(
       password,
       Number(this.configService.get<number>('SALT')),
     );
 
-    const userData: CreateUserDto = {
+    const userData: IUser = {
       ...signUpDto,
       email,
       password: hashPassword,
@@ -41,16 +45,16 @@ export class AuthService {
     const { email, password } = signInDto;
 
     const user = await this.userService.findOneByEmail(email);
-
-    if (!user) throw new Error('User does not exists');
+    if (!user) throw new UnauthorizedException('Invalid password or email');
 
     const isValidPassword = await bcrypt.compare(password, user.password);
-    if (!isValidPassword) throw new Error('Invalid password');
+    if (!isValidPassword) {
+      throw new UnauthorizedException('Invalid password or email');
+    }
 
     const payload: ITokenPayload = {
       id: user.id,
       email: user.email,
-      phone: user.phone,
     };
 
     const tokens = this.createTokens(payload);
@@ -122,7 +126,6 @@ export class AuthService {
     const payload: ITokenPayload = {
       id: user.id,
       email: user.email,
-      phone: user.phone,
     };
 
     const tokens = this.createTokens(payload);

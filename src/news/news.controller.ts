@@ -8,9 +8,10 @@ import {
   Delete,
   UseGuards,
 } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-news.dto';
+import { CreateNewsDto } from './dto/create-news.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { NewsService } from './news.service';
+import { UpdateNewsDto } from './dto/update-news.dto';
 
 @Controller('news')
 export class NewsController {
@@ -18,7 +19,7 @@ export class NewsController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.newsService.findOne(+id);
+    return this.newsService.findOneById(+id, true);
   }
 
   @Get()
@@ -28,13 +29,13 @@ export class NewsController {
 
   @Post()
   @UseGuards(AuthGuard)
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.newsService.create(createUserDto);
+  create(@Body() createNewsDto: CreateNewsDto) {
+    return this.newsService.create(createNewsDto);
   }
 
   @Patch(':id')
   @UseGuards(AuthGuard)
-  update(@Param('id') id: string, @Body() updateNewsDto: any) {
+  update(@Param('id') id: string, @Body() updateNewsDto: UpdateNewsDto) {
     return this.newsService.update(+id, updateNewsDto);
   }
 

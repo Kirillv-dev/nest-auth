@@ -1,5 +1,6 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-news.dto';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { CreateNewsDto } from './dto/create-news.dto';
+import { UpdateNewsDto } from './dto/update-news.dto';
 import { NewsRepository } from './news.repository';
 
 @Injectable()
@@ -9,23 +10,30 @@ export class NewsService {
     public newsRepository: NewsRepository,
   ) {}
 
-  create(createUserDto: CreateUserDto) {
-    return this.newsRepository.create(createUserDto);
-  }
-
-  update(id: number, updateNewsDto: any) {
-    return this.newsRepository.updateById(id, updateNewsDto);
-  }
-
-  findOne(where: any) {
-    return this.newsRepository.findOne(where);
+  create(createNewsDto: CreateNewsDto) {
+    return this.newsRepository.create(createNewsDto);
   }
 
   findAll() {
     return this.newsRepository.findAll({});
   }
 
-  delete(id: number) {
+  async findOneById(id: number, throwIfNotFound: boolean = false) {
+    const news = await this.newsRepository.findOneById(id);
+
+    if (!news && throwIfNotFound) {
+      throw new NotFoundException('News with this id does not exists');
+    }
+    return news;
+  }
+
+  async update(id: number, updateNewsDto: UpdateNewsDto) {
+    await this.findOneById(id, true);
+    return this.newsRepository.updateById(id, updateNewsDto);
+  }
+
+  async delete(id: number) {
+    await this.findOneById(id, true);
     return this.newsRepository.destroyById(id);
   }
 }

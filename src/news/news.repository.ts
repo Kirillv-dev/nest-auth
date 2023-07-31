@@ -18,8 +18,8 @@ export class NewsRepository {
     return this.newsModel.update(updateUserDto, { where: { id } });
   }
 
-  async findOne(where: any) {
-    const user = await this.newsModel.findOne({ where });
+  async findOneById(id: number) {
+    const user = await this.newsModel.findOne({ where: { id } });
     if (user) return user.get();
     return user;
   }

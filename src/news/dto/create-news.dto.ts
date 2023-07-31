@@ -1,8 +1,11 @@
-export class CreateUserDto {
-  id?: number;
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  phone?: string;
-  password?: string;
+import { IsNotEmpty, IsString } from 'class-validator';
+
+export class CreateNewsDto implements INews {
+  @IsNotEmpty()
+  @IsString()
+  title: string;
+
+  @IsNotEmpty()
+  @IsString()
+  content: string;
 }
