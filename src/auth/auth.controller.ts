@@ -1,6 +1,7 @@
 import { Controller, Post, Body, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
+import { RefreshTokenDto } from './dto/refreshToken.dto';
 import { SignInDto } from './dto/signIn.dto';
 import { SignUpDto } from './dto/signUp.dto';
 
@@ -22,8 +23,10 @@ export class AuthController {
   }
 
   @Post('tokens')
-  refreshTokens(@Body('refreshToken') refreshToken: string) {
-    return this.authService.createTokensByRefreshToken(refreshToken);
+  refreshTokens(@Body() refreshTokenDto: RefreshTokenDto) {
+    return this.authService.createTokensByRefreshToken(
+      refreshTokenDto.refreshToken,
+    );
   }
 
   @Post('signout')

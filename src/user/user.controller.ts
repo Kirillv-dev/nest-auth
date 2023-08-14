@@ -1,4 +1,12 @@
-import { Controller, Get, Body, Patch, Param, UseGuards, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Body,
+  Patch,
+  Param,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { UpdateUserDto } from './dto/updateUser.dto';
@@ -16,7 +24,7 @@ export class UserController {
 
   @Get()
   @UseGuards(AuthGuard)
-  findAll(@Query() findUsersDto: FindUsersDto) { 
+  findAll(@Query() findUsersDto: FindUsersDto) {
     return this.userService.findAll(findUsersDto);
   }
 
