@@ -42,7 +42,7 @@ export class UserService {
   async findOneByPhone(phone: string, throwIfNotFound: boolean = false) {
     const user = await this.userRepository.findOne({ phone });
     if (!user && throwIfNotFound) {
-      throw new NotFoundException('User with this id does not exists');
+      throw new NotFoundException('User with this phone does not exists');
     }
 
     return user;
@@ -51,7 +51,7 @@ export class UserService {
   async findOneByEmail(email: string, throwIfNotFound: boolean = false) {
     const user = await this.userRepository.findOne({ email });
     if (!user && throwIfNotFound) {
-      throw new NotFoundException('User with this id does not exists');
+      throw new NotFoundException('User with this email does not exists');
     }
 
     return user;

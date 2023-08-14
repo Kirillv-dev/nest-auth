@@ -18,11 +18,14 @@ export class AuthService {
   ) {}
 
   async signUp(signUpDto: SignUpDto) {
-    const { email, password } = signUpDto;
+    const { email, phone, password } = signUpDto;
 
-    const foundUser = await this.userService.findOneByEmail(email);
-    if (foundUser) {
+    if (email && (await this.userService.findOneByEmail(email))) {
       throw new ConflictException('User with this email already exists');
+    }
+
+    if (phone && (await this.userService.findOneByPhone(phone))) {
+      throw new ConflictException('User with this phone already exists');
     }
 
     const hashPassword = await bcrypt.hash(
@@ -32,18 +35,40 @@ export class AuthService {
 
     const userData: IUser = {
       ...signUpDto,
-      email,
       password: hashPassword,
     };
+    if (email) userData.email = email;
+    if (phone) userData.phone = phone;
 
     const user = await this.userService.create(userData);
     delete user.password;
     return user;
   }
 
-  async signIn(signInDto: SignInDto) {
-    const { email, password } = signInDto;
+  async signInByPhone(signInDto: SignInDto) {
+    const { phone, password } = signInDto;
+    const user = await this.userService.findOneByPhone(phone);
+    if (!user) throw new UnauthorizedException('Invalid password or phone');
 
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    if (!isValidPassword) {
+      throw new UnauthorizedException('Invalid password or phone');
+    }
+
+    const payload: ITokenPayload = {
+      id: user.id,
+      email: user.email,
+    };
+
+    const tokens = this.createTokens(payload);
+
+    await this.updateRefreshToken(user.id, tokens.refreshToken);
+
+    return tokens;
+  }
+
+  async signInByEmail(signInDto: SignInDto) {
+    const { email, password } = signInDto;
     const user = await this.userService.findOneByEmail(email);
     if (!user) throw new UnauthorizedException('Invalid password or email');
 

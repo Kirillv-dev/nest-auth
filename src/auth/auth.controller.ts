@@ -15,7 +15,10 @@ export class AuthController {
 
   @Post('signin')
   signIn(@Body() signInDto: SignInDto) {
-    return this.authService.signIn(signInDto);
+    if (signInDto.phone) {
+      return this.authService.signInByPhone(signInDto);
+    }
+    return this.authService.signInByEmail(signInDto);
   }
 
   @Post('tokens')
