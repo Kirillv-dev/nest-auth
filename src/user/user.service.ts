@@ -1,4 +1,5 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { FindUsersDto } from './dto/findUsersDto.dto';
 import { UserRepository } from './user.repository';
 
 @Injectable()
@@ -16,6 +17,17 @@ export class UserService {
     await this.findOneById(id, true);
 
     return this.userRepository.updateById(id, updateUserDto);
+  }
+
+  async findAll(findUsersDto: FindUsersDto): Promise<IUser[]> {
+    const { page = 1, limit = 10, ...searchingParms } = findUsersDto;
+    const offset = (page - 1) * limit;
+
+    return this.userRepository.findAll({
+      searchingParms,
+      offset,
+      limit,
+    });
   }
 
   async findOneById(id: number, throwIfNotFound: boolean = false) {

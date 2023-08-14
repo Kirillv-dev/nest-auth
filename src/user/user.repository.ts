@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { Op } from 'sequelize';
 import { User } from './user.model';
 
 @Injectable()
@@ -22,5 +23,20 @@ export class UserRepository {
     const user = await this.userModel.findOne({ where });
     if (user) return user.get();
     return user;
+  }
+
+  async findAll(query): Promise<IUser[]> {
+    const { searchingParms, offset, limit } = query;
+    let where = {};
+
+    if (searchingParms) {
+      where = {
+        [Op.and]: Object.entries(searchingParms).map(([key, value]) => ({
+          [key]: { [Op.like]: `%${value}%` },
+        })),
+      };
+    }
+
+    return this.userModel.findAll({ where, offset, limit });
   }
 }
